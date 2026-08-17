@@ -1,8 +1,8 @@
 """Tests for UnifiedTokenCounter."""
 
-import pytest
+from types import SimpleNamespace
 
-from src.token_estimation.counters import UnifiedTokenCounter
+from token_estimation.counters import UnifiedTokenCounter
 
 
 def test_count_empty_text():
@@ -20,12 +20,14 @@ def test_count_openai_model_tiktoken():
     assert result > 0
 
 
-def test_count_claude_model_skip_if_missing():
-    """Count tokens for Claude model - skipped if anthropic not installed."""
-    try:
-        counter = UnifiedTokenCounter()
-        text = "Hello, world!"
-        result = counter.count(text, "claude-3-5-sonnet-20240620")
-        assert result > 0
-    except ImportError:
-        pytest.skip("anthropic package not installed")
+def test_count_claude_model():
+    """Count tokens for a Claude model through the configured client."""
+    messages = SimpleNamespace(
+        count_tokens=lambda **kwargs: SimpleNamespace(input_tokens=4)
+    )
+    client = SimpleNamespace(messages=messages)
+    counter = UnifiedTokenCounter(anthropic_client=client)
+
+    result = counter.count("Hello, world!", "claude-3-5-sonnet-20240620")
+
+    assert result == 4

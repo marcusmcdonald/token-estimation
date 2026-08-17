@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.token_estimation.estimators import FastTokenEstimator, RobustFastTokenEstimator
+from token_estimation.estimators import FastTokenEstimator, RobustFastTokenEstimator
 
 
 def test_fast_estimator_default_rate():

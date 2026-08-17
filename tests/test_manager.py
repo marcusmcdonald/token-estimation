@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.token_estimation import TokenManager, UnifiedTokenCounter
+from token_estimation import TokenManager, UnifiedTokenCounter
 
 
 def test_manager_estimate_default_model():
