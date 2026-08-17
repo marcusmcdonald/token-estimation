@@ -47,16 +47,14 @@ class FastTokenEstimator:
             raise ImportError("tiktoken is required when counter_fn is not provided")
 
         if counter_fn is None:
-            enc = tiktoken.get_encoding(encoding_name) # type: ignore
+            enc = tiktoken.get_encoding(encoding_name)  # type: ignore
             counter_fn = lambda text: len(enc.encode(text))
 
         x = [len(text) for text in corpus if len(text) > 0]
         y = [counter_fn(text) for text in corpus if len(text) > 0]
 
         if not x:
-            raise ValueError(
-                "Sample corpus must contain non-empty text samples."
-            )
+            raise ValueError("Sample corpus must contain non-empty text samples.")
         if len(x) < 2:
             raise ValueError(
                 "At least 2 non-empty text samples are required for calibration."
@@ -154,7 +152,9 @@ class RobustFastTokenEstimator:
             residuals = [y - (rate * x + intercept) for x, y in data]
 
         residuals.sort()
-        percentile_residual = statistics.quantiles(residuals, n=100)[int(target_percentile) - 1]
+        percentile_residual = statistics.quantiles(residuals, n=100)[
+            int(target_percentile) - 1
+        ]
         percentile_residual = max(0.0, percentile_residual)
 
         return cls(
@@ -174,4 +174,7 @@ class RobustFastTokenEstimator:
             return max(1, math.ceil((char_len * self.rate) + self.intercept))
 
         effective_rate = self.rate + self.safety_buffer_rate
-        return max(1, math.ceil((char_len * effective_rate) + self.intercept + self.fixed_buffer))
+        return max(
+            1,
+            math.ceil((char_len * effective_rate) + self.intercept + self.fixed_buffer),
+        )

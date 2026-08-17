@@ -58,7 +58,9 @@ class UnifiedTokenCounter:
         """Get or initialize Gemini client."""
         if self._gemini_client is None:
             if genai is None:
-                raise ImportError("google-genai package is required for Gemini API counting.")
+                raise ImportError(
+                    "google-genai package is required for Gemini API counting."
+                )
             self._gemini_client = genai.Client()
         return self._gemini_client
 
@@ -67,11 +69,15 @@ class UnifiedTokenCounter:
         """Get or initialize LLaMA tokenizer."""
         if self._llama_tokenizer is None:
             if AutoTokenizer is None:
-                raise ImportError("transformers is required for local LLaMA tokenization.")
+                raise ImportError(
+                    "transformers is required for local LLaMA tokenization."
+                )
             self._llama_tokenizer = AutoTokenizer.from_pretrained(self._llama_model_id)
         return self._llama_tokenizer
 
-    def count(self, text: str, model_name: str, *, use_local_gemini: bool = False) -> int:
+    def count(
+        self, text: str, model_name: str, *, use_local_gemini: bool = False
+    ) -> int:
         """Count exact tokens for a given text and model identifier."""
         if not text:
             return 0
@@ -84,9 +90,13 @@ class UnifiedTokenCounter:
                 if genai is None:
                     raise ImportError("google-genai package is required.")
                 if self._gemini_local_tokenizer is None:
-                    self._gemini_local_tokenizer = genai.LocalTokenizer(model_name=model_name)
+                    self._gemini_local_tokenizer = genai.LocalTokenizer(
+                        model_name=model_name
+                    )
                 return self._gemini_local_tokenizer.count_tokens(text).total_tokens  # type: ignore
-            res = self.gemini_client.models.count_tokens(model=model_name, contents=text)
+            res = self.gemini_client.models.count_tokens(
+                model=model_name, contents=text
+            )
             return res.total_tokens
 
         # Anthropic / Claude Models
@@ -108,7 +118,10 @@ class UnifiedTokenCounter:
         try:
             enc = tiktoken.encoding_for_model(model_name)
         except KeyError:
-            logger.warning("Model '%s' not found in tiktoken. Falling back to o200k_base.", model_name)
+            logger.warning(
+                "Model '%s' not found in tiktoken. Falling back to o200k_base.",
+                model_name,
+            )
             enc = tiktoken.get_encoding("o200k_base")
 
         return len(enc.encode(text))

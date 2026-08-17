@@ -41,13 +41,17 @@ class TokenManager:
         self.estimators[key] = estimator
         return estimator
 
-    def estimate(self, text: str, model_name: str, *, safe_upper_bound: bool = False) -> int:
+    def estimate(
+        self, text: str, model_name: str, *, safe_upper_bound: bool = False
+    ) -> int:
         """Fast O(1) multi-model estimate."""
         key = self._normalize_key(model_name)
         estimator = self.estimators.get(key)
 
         if not estimator:
-            matched_rate = next((r for k, r in self.DEFAULT_RATES.items() if k in key), 0.25)
+            matched_rate = next(
+                (r for k, r in self.DEFAULT_RATES.items() if k in key), 0.25
+            )
             estimator = FastTokenEstimator(rate=matched_rate, intercept=1.0)
 
         return estimator.estimate(text, safe_upper_bound=safe_upper_bound)
