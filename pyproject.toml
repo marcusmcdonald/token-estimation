@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "token-estimation"
+version = "0.1.0"
+description = "Fast and robust token estimation for LLMs"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "Marcus McDonald", email = "marcus.is.mobile@gmail.com" }
+]
+dependencies = [
+    "tiktoken>=0.5.0",
+]
+
+[project.optional-dependencies]
+anthropic = ["anthropic>=0.25.0"]
+gemini = ["google-genai>=0.3.0"]
+llama = ["transformers>=4.30.0"]
+all = [
+    "anthropic>=0.25.0",
+    "google-genai>=0.3.0",
+    "transformers>=4.30.0",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[project.urls]
+Repository = "https://github.com/marcusmcdonald/token-estimation"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
