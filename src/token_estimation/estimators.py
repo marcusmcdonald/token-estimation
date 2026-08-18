@@ -6,11 +6,16 @@ from typing import Any, Callable
 
 from .protocols import TokenEstimator
 
-class CharCountEncoding:
-    """Encoding that returns one token per four characters."""
+class _FourCharactersPerTokenCounter:
+    """Approximate token counts at a rate of one token per four characters.
 
-    def encode(self, text: str, **kwargs) -> list[int]:
-        return list(map(ord, text[::4]))
+    This approximation is based on OpenAI's rule of thumb for English text:
+    https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
+    Actual token counts vary by text, model, and encoding.
+    """
+
+    def count(self, text: str) -> int:
+        return len(text[::4])
 
 
 class FastTokenEstimator:
@@ -39,13 +44,12 @@ class FastTokenEstimator:
         Args:
             corpus: List of text samples for calibration.
             counter_fn: Optional custom token counting function. If not provided,
-                uses CharCountEncoding as the default.
+                uses a one-token-per-four-characters approximation.
             safety_factor: Multiplicative safety factor for upper bound estimates.
         """
 
         if counter_fn is None:
-            enc = CharCountEncoding()
-            counter_fn = lambda text: len(enc.encode(text))
+            counter_fn = _FourCharactersPerTokenCounter().count
 
         x = [len(text) for text in corpus if len(text) > 0]
         y = [counter_fn(text) for text in corpus if len(text) > 0]

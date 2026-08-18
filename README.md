@@ -76,6 +76,13 @@ Built-in rates are convenient defaults. For better estimates, calibrate against
 text representative of the prompts, documents, or code your application will
 process. Use at least two non-empty samples with varied lengths.
 
+When no `counter_fn` is supplied, `FastTokenEstimator` uses the rough English
+rule of thumb that one token is approximately four characters, as described in
+OpenAI's [guide to tokens and token counting](https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them).
+This is an approximation rather than tokenization: actual counts vary with the
+text, model, and encoding. For workload- or model-specific calibration, pass a
+tokenizer or token-counting service as `counter_fn`.
+
 ```python
 from token_estimation import TokenManager
 
