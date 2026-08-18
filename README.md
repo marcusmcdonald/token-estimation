@@ -76,9 +76,11 @@ Built-in rates are convenient defaults. For better estimates, calibrate against
 text representative of the prompts, documents, or code your application will
 process. Use at least two non-empty samples with varied lengths.
 
-When no `counter_fn` is supplied, `FastTokenEstimator` uses the rough English
-rule of thumb that one token is approximately four characters, as described in
-OpenAI's [guide to tokens and token counting](https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them).
+`TokenManager` relies on an estimator to provide its fast token estimates, and
+`calibrate_model` uses `FastTokenEstimator` by default. When no `counter_fn` is
+supplied, `FastTokenEstimator` uses the rough English rule of thumb that one
+token is approximately four characters, as described in OpenAI's
+[guide to tokens and token counting](https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them).
 This is an approximation rather than tokenization: actual counts vary with the
 text, model, and encoding. For workload- or model-specific calibration, pass a
 tokenizer or token-counting service as `counter_fn`.
@@ -172,10 +174,11 @@ tokens = estimator.estimate("New incoming text")
 upper_bound = estimator.estimate("New incoming text", safe_upper_bound=True)
 ```
 
-`FastTokenEstimator` uses ordinary least-squares regression. By default it
-calibrates against a lightweight character-based counter. Supply a custom
-counting function to calibrate against a tokenizer or another token-counting
-service:
+`FastTokenEstimator` uses ordinary least-squares regression. Its `calibrate`
+method accepts an optional `counter_fn`.
+Without `counter_fn`, calibration uses the approximate rate of one token
+per four characters. Supply a counting function to calibrate against a tokenizer
+or another token-counting service:
 
 ```python
 estimator = FastTokenEstimator.calibrate(
