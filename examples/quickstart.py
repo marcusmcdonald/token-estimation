@@ -48,7 +48,6 @@ def manager_workflow() -> None:
     estimator = manager.calibrate_model(
         "custom-model",
         CALIBRATION_SAMPLES,
-        encoding_name=ENCODING_NAME,
         safety_factor=1.10,
     )
     print(f"   Rate: {estimator.rate:.4f} tokens/character")
@@ -95,7 +94,6 @@ def direct_estimator_workflow() -> None:
     print("\n5. FastTokenEstimator: the lower-level API")
     estimator = FastTokenEstimator.calibrate(
         corpus=CALIBRATION_SAMPLES,
-        encoding_name=ENCODING_NAME,
         safety_factor=1.10,
     )
 
@@ -115,8 +113,8 @@ def direct_estimator_workflow() -> None:
     actual_count = len(encoder.encode(incoming_text))
     print(f"   Actual tiktoken count: {actual_count} tokens")
 
-    # Supplying counter_fn is equivalent to encoding_name and also lets the
-    # estimator calibrate against another provider or custom tokenizer.
+    # Supplying counter_fn lets the estimator calibrate against a provider or
+    # custom tokenizer instead of its default character-based counter.
     custom_counter_estimator = FastTokenEstimator.calibrate(
         corpus=CALIBRATION_SAMPLES,
         counter_fn=lambda text: len(encoder.encode(text)),

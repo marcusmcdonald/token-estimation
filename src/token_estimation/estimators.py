@@ -6,10 +6,11 @@ from typing import Any, Callable
 
 from .protocols import TokenEstimator
 
-try:
-    import tiktoken
-except ImportError:
-    tiktoken = None  # type: ignore
+class CharCountEncoding:
+    """Encoding that returns one token per four characters."""
+
+    def encode(self, text: str, **kwargs) -> list[int]:
+        return list(map(ord, text[::4]))
 
 
 class FastTokenEstimator:
@@ -30,7 +31,6 @@ class FastTokenEstimator:
         cls,
         corpus: list[str],
         counter_fn: Callable[[str], int] | None = None,
-        encoding_name: str = "o200k_base",
         safety_factor: float = 1.10,
         **kwargs: Any,
     ) -> "FastTokenEstimator":
@@ -39,15 +39,12 @@ class FastTokenEstimator:
         Args:
             corpus: List of text samples for calibration.
             counter_fn: Optional custom token counting function. If not provided,
-                uses tiktoken with the specified encoding_name.
-            encoding_name: Tiktoken encoding to use if counter_fn not provided.
+                uses CharCountEncoding as the default.
             safety_factor: Multiplicative safety factor for upper bound estimates.
         """
-        if tiktoken is None and counter_fn is None:
-            raise ImportError("tiktoken is required when counter_fn is not provided")
 
         if counter_fn is None:
-            enc = tiktoken.get_encoding(encoding_name)  # type: ignore
+            enc = CharCountEncoding()
             counter_fn = lambda text: len(enc.encode(text))
 
         x = [len(text) for text in corpus if len(text) > 0]

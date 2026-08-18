@@ -89,7 +89,6 @@ manager = TokenManager()
 estimator = manager.calibrate_model(
     "custom-model",
     samples,
-    encoding_name="o200k_base",
     safety_factor=1.10,
 )
 
@@ -159,7 +158,6 @@ from token_estimation import FastTokenEstimator
 
 estimator = FastTokenEstimator.calibrate(
     corpus=samples,
-    encoding_name="o200k_base",
     safety_factor=1.10,
 )
 
@@ -167,8 +165,10 @@ tokens = estimator.estimate("New incoming text")
 upper_bound = estimator.estimate("New incoming text", safe_upper_bound=True)
 ```
 
-`FastTokenEstimator` uses ordinary least-squares regression. It accepts either
-a `tiktoken` encoding name or a custom counting function:
+`FastTokenEstimator` uses ordinary least-squares regression. By default it
+calibrates against a lightweight character-based counter. Supply a custom
+counting function to calibrate against a tokenizer or another token-counting
+service:
 
 ```python
 estimator = FastTokenEstimator.calibrate(
